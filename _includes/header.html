@@ -1,0 +1,16 @@
+<header id="header">
+	<div class="inner">
+		<div id="branding">
+			<a href="/"><h1>Novian | l<span style="color: #888888;">0</span>l</h1></a>
+		</div>
+		<nav id="nav">
+			<ul>
+				{% for page in site.pages %} {% if page.title %}
+				<li><a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
+				{% endif %} {% endfor %}
+				<li><a href="{{ "/blog" | prepend: site.baseurl }}">Blog</a></li>
+			</ul>
+		</nav>
+	</div>
+</header>
+ 

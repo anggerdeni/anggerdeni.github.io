@@ -1,0 +1,15 @@
+# Site Settings
+title: l0l
+email: anggerdeni@gmail.com
+description: >
+  l0l Personal Notes
+baseurl: ""
+url: "http://localhost:4000"
+twitter_username: anggerdeni
+github_username:  anggerdeni
+# Build Settings
+sass:
+  sass_dir: _sass
+include: ['_pages']
+kramdown:
+  input: GFM
