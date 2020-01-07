@@ -1,34 +1,27 @@
----
-layout: post
-title:  "[RE] uwu - Arkavidia 6"
-date:   2020-01-06 18:59:00
-categories: ctf arkavidia
----
-## Analisa
-Diberikan sebuah binary file ELF 64 bit.
+I"�D<h2 id="pwn">Pwn</h2>
+<h3 id="uwu-easy">uwu [easy]</h3>
+<h4 id="analisa">Analisa</h4>
+<p>Diberikan sebuah binary file ELF 64 bit.</p>
 
-![](/assets/CTF/2020/Arkavidia%206/Reverse%20Engineering/uwu/ss/ss1.png)  
+<p><img src="/assets/CTF/2020/Arkavidia%206/Reverse%20Engineering/uwu/ss/ss1.png" alt="" /></p>
 
+<p>Program ini meminta 3 buah input.<br />
+<img src="/assets/CTF/2020/Arkavidia%206/Reverse%20Engineering/uwu/ss/ss2.png" alt="" /></p>
 
-Program ini meminta 3 buah input.  
-![](/assets/CTF/2020/Arkavidia%206/Reverse%20Engineering/uwu/ss/ss2.png)  
+<p>Langsung coba disassemble dengan menggunakan <code class="highlighter-rouge">gdb</code>. Karena file yang diberikan merupakan stripped binary, kita perlu mencari dulu dimana fungsi main.</p>
 
-Langsung coba disassemble dengan menggunakan `gdb`. Karena file yang diberikan merupakan stripped binary, kita perlu mencari dulu dimana fungsi main.
-
-Cari dulu dimana entry point program
-```
-gdb-peda$ info file
-Symbols from "<redacted>".
+<p>Cari dulu dimana entry point program</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gdb-peda$ info file
+Symbols from "&lt;redacted&gt;".
 Local exec file:
-    `<redacted>', file type elf64-x86-64.
+    `&lt;redacted&gt;', file type elf64-x86-64.
     Entry point: 0x1090
-<snip>
-```
+&lt;snip&gt;
+</code></pre></div></div>
 
-Karena kita tahu alamat entry point adalah `0x1090`, coba saja kita decompile beberapa instruksi pada alamat tersebut.
+<p>Karena kita tahu alamat entry point adalah <code class="highlighter-rouge">0x1090</code>, coba saja kita decompile beberapa instruksi pada alamat tersebut.</p>
 
-```
-gdb-peda$ pdisass 0x1090,0x10bb
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gdb-peda$ pdisass 0x1090,0x10bb
 Dump of assembler code from 0x1090 to 0x10bb::  Dump of assembler code from 0x1090 to 0x10bb:
    0x0000000000001090:  xor    ebp,ebp
    0x0000000000001092:  mov    r9,rdx
@@ -41,13 +34,12 @@ Dump of assembler code from 0x1090 to 0x10bb::  Dump of assembler code from 0x10
    0x00000000000010a6:  lea    rcx,[rip+0x493]        # 0x1540
    0x00000000000010ad:  lea    rdi,[rip+0x1d5]        # 0x1289
    0x00000000000010b4:  call   QWORD PTR [rip+0x2f26]        # 0x3fe0
-```
+</code></pre></div></div>
 
-Terlihat `0x1289` dimasukkan dalam register rdi sebelum perintah `call` dijalankan. Berarti ini adalah fungsi main dari program.
+<p>Terlihat <code class="highlighter-rouge">0x1289</code> dimasukkan dalam register rdi sebelum perintah <code class="highlighter-rouge">call</code> dijalankan. Berarti ini adalah fungsi main dari program.</p>
 
-Coba kita disassemble beberapa instruksi dari `0x1289`
-```
-gdb-peda$ pdisass 0x1289,0x1537
+<p>Coba kita disassemble beberapa instruksi dari <code class="highlighter-rouge">0x1289</code></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gdb-peda$ pdisass 0x1289,0x1537
 Dump of assembler code from 0x1289 to 0x1537::  Dump of assembler code from 0x1289 to 0x1537:
    0x0000000000001289:  push   rbp
    0x000000000000128a:  mov    rbp,rsp
@@ -72,32 +64,29 @@ Dump of assembler code from 0x1289 to 0x1537::  Dump of assembler code from 0x12
    0x000000000000131b:  mov    BYTE PTR [rbp-0x151],0x4d
    0x0000000000001322:  mov    QWORD PTR [rbp-0x188],0xb
    0x000000000000132d:  mov    DWORD PTR [rbp-0x1bc],0x1
-```
+</code></pre></div></div>
 
-Di atas terlihat terjadi inisialisasi beberapa 'variable' di stack. 
-```
-   0x0000000000001337:  lea    rcx,[rbp-0x70]
+<p>Di atas terlihat terjadi inisialisasi beberapa ‘variable’ di stack.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   0x0000000000001337:  lea    rcx,[rbp-0x70]
    0x000000000000133b:  lea    rdx,[rbp-0xe0]
    0x0000000000001342:  lea    rax,[rbp-0x150]
    0x0000000000001349:  mov    rsi,rax
    0x000000000000134c:  lea    rdi,[rip+0xcb1]        # 0x2004
    0x0000000000001353:  mov    eax,0x0
-   0x0000000000001358:  call   0x1060 <__isoc99_scanf@plt>
+   0x0000000000001358:  call   0x1060 &lt;__isoc99_scanf@plt&gt;
    0x000000000000135d:  lea    rax,[rbp-0x150]
    0x0000000000001364:  mov    rdi,rax
    0x0000000000001367:  call   0x1175
-```
+</code></pre></div></div>
 
-Kemudian input kita dibagi menjadi tiga bagian, masing-masing disimpan pada \[rbp-0x70\] (input ketiga), \[rbp-0xe0\] (input kedua), \[rbp-0x150\] (input pertama).  
+<p>Kemudian input kita dibagi menjadi tiga bagian, masing-masing disimpan pada [rbp-0x70] (input ketiga), [rbp-0xe0] (input kedua), [rbp-0x150] (input pertama).</p>
 
-```
- 0x000000000000134c:    lea    rdi,[rip+0xcb1]        # 0x2004
-```
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 0x000000000000134c:    lea    rdi,[rip+0xcb1]        # 0x2004
+</code></pre></div></div>
 
-Setelah didebug, `0x2004` berisi '%s %s %s', dari sini kita konfirmasi bahwa input kita disimpan pada 3 tempat berbeda.
+<p>Setelah didebug, <code class="highlighter-rouge">0x2004</code> berisi ‘%s %s %s’, dari sini kita konfirmasi bahwa input kita disimpan pada 3 tempat berbeda.</p>
 
-```
-   0x000000000000135d:  lea    rax,[rbp-0x150]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   0x000000000000135d:  lea    rax,[rbp-0x150]
    0x0000000000001364:  mov    rdi,rax
    0x0000000000001367:  call   0x1175
    0x000000000000136c:  mov    QWORD PTR [rbp-0x180],rax
@@ -108,12 +97,11 @@ Setelah didebug, `0x2004` berisi '%s %s %s', dari sini kita konfirmasi bahwa inp
    0x0000000000001389:  lea    rax,[rbp-0x70]
    0x000000000000138d:  mov    rdi,rax
    0x0000000000001390:  call   0x122d
-```
-Selanjutnya, input pertama dijadikan argumen untuk fungsi pada address `0x1175`, demikian pula input kedua menjadi argumen untuk fungsi pada address `0x11d1`, serta input ketiga menjadi argumen untuk fungsi pada address `0x122d`.
+</code></pre></div></div>
+<p>Selanjutnya, input pertama dijadikan argumen untuk fungsi pada address <code class="highlighter-rouge">0x1175</code>, demikian pula input kedua menjadi argumen untuk fungsi pada address <code class="highlighter-rouge">0x11d1</code>, serta input ketiga menjadi argumen untuk fungsi pada address <code class="highlighter-rouge">0x122d</code>.</p>
 
-Kemudian dilakukan pengecekan pertama sebagai berikut.
-```
-   0x0000000000001395:  mov    QWORD PTR [rbp-0x170],rax
+<p>Kemudian dilakukan pengecekan pertama sebagai berikut.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   0x0000000000001395:  mov    QWORD PTR [rbp-0x170],rax
    0x000000000000139c:  mov    QWORD PTR [rbp-0x1b0],0x0
    0x00000000000013a7:  jmp    0x13fd
    0x00000000000013a9:  mov    rdx,QWORD PTR [rbp-0x180]
@@ -128,19 +116,18 @@ Kemudian dilakukan pengecekan pertama sebagai berikut.
    0x00000000000013d3:  je     0x13f5
    0x00000000000013d5:  mov    DWORD PTR [rbp-0x1bc],0x0
    0x00000000000013df:  lea    rdi,[rip+0xc27]        # 0x200d
-   0x00000000000013e6:  call   0x1030 <puts@plt>
+   0x00000000000013e6:  call   0x1030 &lt;puts@plt&gt;
    0x00000000000013eb:  mov    edi,0x0
-   0x00000000000013f0:  call   0x1070 <exit@plt>
+   0x00000000000013f0:  call   0x1070 &lt;exit@plt&gt;
    0x00000000000013f5:  add    QWORD PTR [rbp-0x1b0],0x1
    0x00000000000013fd:  mov    rax,QWORD PTR [rbp-0x1b0]
    0x0000000000001404:  cmp    rax,QWORD PTR [rbp-0x198]
    0x000000000000140b:  jb     0x13a9
-```
-Dilakukan iterasi sebanyak `[rbp-0x198]` kali dengan `[rbp-0x1b0]` sebagai index untuk mengambil tiap karakter dari `[rbp-0x180]`  (hasil olahan input pertama) kita. Kemudian dibandingkan dengan apa yang ada pada address `[rbp-0x1b7]`. Hasilnya harus sama semua.
+</code></pre></div></div>
+<p>Dilakukan iterasi sebanyak <code class="highlighter-rouge">[rbp-0x198]</code> kali dengan <code class="highlighter-rouge">[rbp-0x1b0]</code> sebagai index untuk mengambil tiap karakter dari <code class="highlighter-rouge">[rbp-0x180]</code>  (hasil olahan input pertama) kita. Kemudian dibandingkan dengan apa yang ada pada address <code class="highlighter-rouge">[rbp-0x1b7]</code>. Hasilnya harus sama semua.</p>
 
-Coba lihat apa yang dilakukan terhadap input pertama kita.
-```
-gdb-peda$ pdisass 0x1175,0x11d1
+<p>Coba lihat apa yang dilakukan terhadap input pertama kita.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gdb-peda$ pdisass 0x1175,0x11d1
 Dump of assembler code from 0x1175 to 0x11d1::  Dump of assembler code from 0x1175 to 0x11d1:
    0x0000000000001175:  push   rbp
    0x0000000000001176:  mov    rbp,rsp
@@ -149,7 +136,7 @@ Dump of assembler code from 0x1175 to 0x11d1::  Dump of assembler code from 0x11
    0x0000000000001181:  mov    QWORD PTR [rbp-0x10],0x0
    0x0000000000001189:  mov    rax,QWORD PTR [rbp-0x18]
    0x000000000000118d:  mov    rdi,rax
-   0x0000000000001190:  call   0x1040 <strlen@plt>
+   0x0000000000001190:  call   0x1040 &lt;strlen@plt&gt;
    0x0000000000001195:  mov    QWORD PTR [rbp-0x8],rax
    0x0000000000001199:  mov    rax,QWORD PTR [rbp-0x8]
    0x000000000000119d:  cmp    rax,QWORD PTR [rbp-0x10]
@@ -170,12 +157,11 @@ Dump of assembler code from 0x1175 to 0x11d1::  Dump of assembler code from 0x11
    0x00000000000011cb:  mov    rax,QWORD PTR [rbp-0x18]
    0x00000000000011cf:  leave  
    0x00000000000011d0:  ret 
-```
-Pada fungsi ini hanya dilakukan xor atas tiap input kita dengan 0x40.
+</code></pre></div></div>
+<p>Pada fungsi ini hanya dilakukan xor atas tiap input kita dengan 0x40.</p>
 
-Pengecekan kedua
-```
-   0x000000000000140d:  mov    QWORD PTR [rbp-0x1a8],0x0
+<p>Pengecekan kedua</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   0x000000000000140d:  mov    QWORD PTR [rbp-0x1a8],0x0
    0x0000000000001418:  jmp    0x146e
    0x000000000000141a:  mov    rdx,QWORD PTR [rbp-0x178]
    0x0000000000001421:  mov    rax,QWORD PTR [rbp-0x1a8]
@@ -189,19 +175,18 @@ Pengecekan kedua
    0x0000000000001444:  je     0x1466
    0x0000000000001446:  mov    DWORD PTR [rbp-0x1bc],0x0
    0x0000000000001450:  lea    rdi,[rip+0xbb6]        # 0x200d
-   0x0000000000001457:  call   0x1030 <puts@plt>
+   0x0000000000001457:  call   0x1030 &lt;puts@plt&gt;
    0x000000000000145c:  mov    edi,0x0
-   0x0000000000001461:  call   0x1070 <exit@plt>
+   0x0000000000001461:  call   0x1070 &lt;exit@plt&gt;
    0x0000000000001466:  add    QWORD PTR [rbp-0x1a8],0x1
    0x000000000000146e:  mov    rax,QWORD PTR [rbp-0x1a8]
    0x0000000000001475:  cmp    rax,QWORD PTR [rbp-0x190]
    0x000000000000147c:  jb     0x141a
-```
-Mirip dengan pengecekan pertama, hasil olahan input kedua kita yang berada pada address `[rbp-0x178]` dibandingkan dengan `[rbp-0x166]` sebanyak `[rbp-0x190]` karakter.
+</code></pre></div></div>
+<p>Mirip dengan pengecekan pertama, hasil olahan input kedua kita yang berada pada address <code class="highlighter-rouge">[rbp-0x178]</code> dibandingkan dengan <code class="highlighter-rouge">[rbp-0x166]</code> sebanyak <code class="highlighter-rouge">[rbp-0x190]</code> karakter.</p>
 
-Lihat apa yang dilakukan terhadap input kedua kita.
-```
-gdb-peda$ pdisass 0x11d1,0x122d
+<p>Lihat apa yang dilakukan terhadap input kedua kita.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gdb-peda$ pdisass 0x11d1,0x122d
 Dump of assembler code from 0x11d1 to 0x122d::  Dump of assembler code from 0x11d1 to 0x122d:
    0x00000000000011d1:  push   rbp
    0x00000000000011d2:  mov    rbp,rsp
@@ -210,7 +195,7 @@ Dump of assembler code from 0x11d1 to 0x122d::  Dump of assembler code from 0x11
    0x00000000000011dd:  mov    QWORD PTR [rbp-0x10],0x0
    0x00000000000011e5:  mov    rax,QWORD PTR [rbp-0x18]
    0x00000000000011e9:  mov    rdi,rax
-   0x00000000000011ec:  call   0x1040 <strlen@plt>
+   0x00000000000011ec:  call   0x1040 &lt;strlen@plt&gt;
    0x00000000000011f1:  mov    QWORD PTR [rbp-0x8],rax
    0x00000000000011f5:  mov    rax,QWORD PTR [rbp-0x8]
    0x00000000000011f9:  cmp    rax,QWORD PTR [rbp-0x10]
@@ -231,18 +216,15 @@ Dump of assembler code from 0x11d1 to 0x122d::  Dump of assembler code from 0x11
    0x0000000000001227:  mov    rax,QWORD PTR [rbp-0x18]
    0x000000000000122b:  leave  
    0x000000000000122c:  ret
-```
+</code></pre></div></div>
 
-Perhatikan pada instruksi ini
-```
-   0x000000000000120d:  lea    ecx,[rax+0x20]
-```
-tiap byte input kita ditambah dengan 0x20
+<p>Perhatikan pada instruksi ini</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   0x000000000000120d:  lea    ecx,[rax+0x20]
+</code></pre></div></div>
+<p>tiap byte input kita ditambah dengan 0x20</p>
 
-
-Pengecekan ketiga.
-```
-   0x000000000000147e:  mov    QWORD PTR [rbp-0x1a0],0x0
+<p>Pengecekan ketiga.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   0x000000000000147e:  mov    QWORD PTR [rbp-0x1a0],0x0
    0x0000000000001489:  jmp    0x14df
    0x000000000000148b:  mov    rdx,QWORD PTR [rbp-0x170]
    0x0000000000001492:  mov    rax,QWORD PTR [rbp-0x1a0]
@@ -256,20 +238,19 @@ Pengecekan ketiga.
    0x00000000000014b5:  je     0x14d7
    0x00000000000014b7:  mov    DWORD PTR [rbp-0x1bc],0x0
    0x00000000000014c1:  lea    rdi,[rip+0xb45]        # 0x200d
-   0x00000000000014c8:  call   0x1030 <puts@plt>
+   0x00000000000014c8:  call   0x1030 &lt;puts@plt&gt;
    0x00000000000014cd:  mov    edi,0x0
-   0x00000000000014d2:  call   0x1070 <exit@plt>
+   0x00000000000014d2:  call   0x1070 &lt;exit@plt&gt;
    0x00000000000014d7:  add    QWORD PTR [rbp-0x1a0],0x1
    0x00000000000014df:  mov    rax,QWORD PTR [rbp-0x1a0]
    0x00000000000014e6:  cmp    rax,QWORD PTR [rbp-0x188]
    0x00000000000014ed:  jb     0x148b
-```
-Mirip dengan pengecekan sebelumnya, hasil olahan input kedua kita yang berada pada address `[rbp-0x170]` dibandingkan dengan `[rbp-0x15b]` sebanyak `[rbp-0x188]` karakter.
+</code></pre></div></div>
+<p>Mirip dengan pengecekan sebelumnya, hasil olahan input kedua kita yang berada pada address <code class="highlighter-rouge">[rbp-0x170]</code> dibandingkan dengan <code class="highlighter-rouge">[rbp-0x15b]</code> sebanyak <code class="highlighter-rouge">[rbp-0x188]</code> karakter.</p>
 
-Lihat fungsi yang memanipulasi input ketiga.
+<p>Lihat fungsi yang memanipulasi input ketiga.</p>
 
-```
-gdb-peda$ pdisass 0x122d,0x1289
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gdb-peda$ pdisass 0x122d,0x1289
 Dump of assembler code from 0x122d to 0x1289::  Dump of assembler code from 0x122d to 0x1289:
    0x000000000000122d:  push   rbp
    0x000000000000122e:  mov    rbp,rsp
@@ -278,7 +259,7 @@ Dump of assembler code from 0x122d to 0x1289::  Dump of assembler code from 0x12
    0x0000000000001239:  mov    QWORD PTR [rbp-0x10],0x0
    0x0000000000001241:  mov    rax,QWORD PTR [rbp-0x18]
    0x0000000000001245:  mov    rdi,rax
-   0x0000000000001248:  call   0x1040 <strlen@plt>
+   0x0000000000001248:  call   0x1040 &lt;strlen@plt&gt;
    0x000000000000124d:  mov    QWORD PTR [rbp-0x8],rax
    0x0000000000001251:  mov    rax,QWORD PTR [rbp-0x8]
    0x0000000000001255:  cmp    rax,QWORD PTR [rbp-0x10]
@@ -299,63 +280,37 @@ Dump of assembler code from 0x122d to 0x1289::  Dump of assembler code from 0x12
    0x0000000000001283:  mov    rax,QWORD PTR [rbp-0x18]
    0x0000000000001287:  leave  
    0x0000000000001288:  ret 
-```
-Perhatikan perintah ini
-```
-   0x0000000000001269:  lea    ecx,[rax-0x30]
-```
-Tiap karakter input kita dikurangi 0x30
+</code></pre></div></div>
+<p>Perhatikan perintah ini</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   0x0000000000001269:  lea    ecx,[rax-0x30]
+</code></pre></div></div>
+<p>Tiap karakter input kita dikurangi 0x30</p>
 
-## Solve
-Cukup sederhana, jalankan saja debugger (gdb), sampai selesai inisialisasi variabel. 
-```
-b *0x555555555337
-```
+<h4 id="solve">Solve</h4>
+<p>Cukup sederhana, jalankan saja debugger (gdb), sampai selesai inisialisasi variabel.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b *0x555555555337
+</code></pre></div></div>
 
-Input pertama
-```
-gdb-peda$ x/b $rbp-0x198
-0x7fffffffdba8: 0x07
-gdb-peda$ x/7b $rbp-0x1b7
-0x7fffffffdb89: 0x01    0x32    0x2b    0x21    0x36    0x76    0x3b
-
-```
-
-Input kedua
-```
-gdb-peda$ x/b $rbp-0x190
+<p>Input pertama</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gdb-peda$ x/b $rbp-0x190
 0x7fffffffdbb0: 0x0b
+
+Input pertama terdapat 0x0b karakter ( 11 karakter )
+
 gdb-peda$ x/11b $rbp-0x166
 0x7fffffffdbda: 0x95    0x97    0x75    0x7f    0x85    0x54    0x9a    0x99
 0x7fffffffdbe2: 0x7f    0x63    0x92
-```
+</code></pre></div></div>
 
-Input ketiga
-```
-gdb-peda$ x/b $rbp-0x188
-0x7fffffffdbb8: 0x0b
-gdb-peda$ x/11b $rbp-0x15b
-0x7fffffffdbe5: 0x04    0x33    0x3b    0x2f    0x3d    0x03    0x2f    0x45
-0x7fffffffdbed: 0x47    0x25    0x4d
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input1</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x95</span><span class="p">,</span> <span class="mh">0x97</span><span class="p">,</span> <span class="mh">0x75</span><span class="p">,</span> <span class="mh">0x7f</span><span class="p">,</span> <span class="mh">0x85</span><span class="p">,</span> <span class="mh">0x54</span><span class="p">,</span> <span class="mh">0x9a</span><span class="p">,</span> <span class="mh">0x99</span><span class="p">,</span> <span class="mh">0x7f</span><span class="p">,</span> <span class="mh">0x63</span><span class="p">,</span> <span class="mh">0x92</span><span class="p">]</span>
+<span class="n">flag1</span> <span class="o">=</span> <span class="s">''</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">input1</span><span class="p">:</span>
+    <span class="n">flag1</span><span class="o">+=</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="o">^</span><span class="mh">0x40</span><span class="p">)</span>
+</code></pre></div></div>
 
-```
+<h4 id="flag">Flag</h4>
 
-```py
-input1 = [0x01, 0x32, 0x2b, 0x21, 0x36, 0x76, 0x3b]
-flag = ''
-for i in input1:
-    flag += chr(i^0x40)
+<h2 id="reverse-engineering">Reverse Engineering</h2>
 
-input2 = [0x95, 0x97, 0x75, 0x7f, 0x85, 0x54, 0x9a, 0x99, 0x7f, 0x63, 0x92]
-for i in input2:
-    flag += chr(i - 0x20)
-
-input3 = [0x04, 0x33, 0x3b, 0x2f, 0x3d, 0x03, 0x2f, 0x45, 0x47, 0x25, 0x4d]
-for i in input3:
-    flag += chr(i + 0x30)
-
-print(flag)
-```
-
-## Flag
-Arkav6{uwU_e4zy_Cr4ck_m3_uwU}
+<h2 id="web-exploitation">Web Exploitation</h2>
+:ET
