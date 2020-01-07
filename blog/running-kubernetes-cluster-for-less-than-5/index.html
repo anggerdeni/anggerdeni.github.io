@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="en" class="font-sans"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"><!-- Meta --><meta name="description" content="How I run kubernetes cluster in my homelab setup for relatively cheap"><meta property="title" content="Running Kubernetes Cluster for Less Than $5"><meta name="keywords" content="Novian Deny,Novian Deny Cahyo Aji, personal site, developer, portfolio, blog, projects, devops, infrastructure engineer, SRE"><meta name="author" content="Novian Deny"><meta name="robots" content="index, follow"><meta name="generator" content="Astro v5.1.1"><!-- OG Meta --><meta property="og:type" content="website"><meta name="og:description" content="How I run kubernetes cluster in my homelab setup for relatively cheap"><meta property="og:title" content="Running Kubernetes Cluster for Less Than $5"><title>Running Kubernetes Cluster for Less Than $5</title><link rel="stylesheet" href="/_astro/about.L7CD1DhU.css">
+<style>[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style></head> <body class="m-auto w-full h-screen max-w-3xl px-4 py-4 bg-charcoal text-cream font-geist text-lg"> <header class="mb-20 font-ubuntu-mono"> <nav> <div class="flex items-center justify-center md:justify-between"> <div class="hidden md:block"> <a class="flex space-x-1 text-sand text-xl" href="/"> <span class="underline text-base/6">></span> <span class="italic">novian.dev</span> </a> </div> <ul class="flex items-center w-auto py-0 text-xl"> <li class="text-center my-0 mx-2"> <a class="hover:text-sand duration-200 " href="/">
+Home
+</a> </li> <li class="text-center my-0 mx-2"> <a class="hover:text-sand duration-200 underline underline-offset-8 text-sand" href="/blog">
+Blog
+</a> </li> <!-- <li class="text-center my-0 mx-2"> --> <!--     <a --> <!--         class={`hover:text-sand duration-200 ${route == "project" ? "underline underline-offset-8 text-sand" : ""}`} --> <!--         href="/project" --> <!--     > --> <!--         Project --> <!--     </a> --> <!-- </li> --> <li class="text-center my-0 mx-2"> <a class="hover:text-sand duration-200 " href="/cheatsheet">
+Cheatsheet
+</a> </li> <li class="text-center my-0 mx-2"> <a class="hover:text-sand duration-200 " href="/about">
+About
+</a> </li> </ul> </div> </nav> </header> <div class="m-auto max-w-4xl">  <div class="flex flex-col items-center text-center my-10"> <h1 class="text-4xl mb-1 text-sand">Running Kubernetes Cluster for Less Than $5</h1> <p class="text-sm text-gray-400"> 25 Jan 25 </p> </div> <div class="flex flex-col items-center"> <div class="text-cream font-poppins text-lg/6 prose dark:prose-invert prose-a:underline prose-a:decoration-sand prose-a:underline-offset-4 hover:prose-a:text-cream
+    prose-h1:font-bold prose-h1:text-xl
+    prose-h2:font-bold prose-h2:text-2xl prose-h2:text-sand
+    prose-h3:font-bold prose-h3:text-lg
+    prose-img:rounded-xl">  <p>Ever since switching career from programmer to an infrastructure engineer, I have been exposed to many new interesting topics. Some of which are <em>kubernetes</em> and <em>homelabbing</em>. The idea of having a physical server running at home for the purpose of general service hosting and also as a literal “lab” has been lingering on my head for quite some time now. And that is how I got the idea of running a <em>kubernetes cluster</em> on premise in my house using my own hardwares. So that’s what I did, I repurposed some of my retired computers to be used as servers and they have been the backbone of my homelab <em>kubernetes cluster</em> for the past 3 months.</p>
+<h2 id="table-of-content">Table of Content</h2>
+<ol>
+<li><a href="#old-hardwares">Hardware</a></li>
+<li><a href="#software">Software</a></li>
+<li><a href="#cost">Cost</a></li>
+<li><a href="#future-work">Future Work</a></li>
+</ol>
+<h2 id="old-hardwares">(Old) Hardwares</h2>
+<p>Let’s start with the hardware. I am using some old computers that I have lying around, and what I mean by “some”, to be precise, is two computers consisting of 1 old laptop (Thinkpad T430) and 1 PC. When I say “old”, it means literally old. The laptop is around 12 years old while the PC is about half that age. Not super exciting and they don’t have a lot of compute power but they are way more than enough for my current use case with tolerable power consumption.</p>
+<h3 id="compute">Compute</h3>
+<p>Below is the general idea of the computers’ specifications:</p>
+<ul>
+<li>Laptop
+<ul>
+<li>I5 3320M 2 cores 4 threads</li>
+<li>16G DDR3L Memory</li>
+<li>128G Sata SSD</li>
+</ul>
+</li>
+<li>PC
+<ul>
+<li>Athlon 3000G 2 cores 4 threads</li>
+<li>16G DDR4 Memory</li>
+<li>240 + 128G Sata SSD</li>
+</ul>
+</li>
+</ul>
+<p>Both machines have some “conditions”, as with many old computers. First, for the laptop, it has broken hinges, dead battery, non-functional keyboard &#x26; touchpad, and also dead CMOS battery. Imperfect as it may, but that laptop is way more reliable, in a way, than the slightly more modern Athlon PC. That PC would just randomly be unable to boot. Sometimes I can’t even go into the BIOS setting, sometimes resetting the BIOS works, sometimes just removing and reinserting the CMOS battery seems to work, sometimes I just let it sleep for a day and be hopeful that the next day it will magically boot. Moreover, this variant of AMD CPU combined with my motherboard won’t go deeper than C2 state (<a href="https://en.wikipedia.org/wiki/ACPI" rel="nofollow" target="_blank">ref</a>), which is not really ideal for running server in which maybe 99% of its uptime is spent on idle.</p>
+<figure class="text-center"><img alt="powertop result in PC" title="Powertop result in PC" width="1742" height="578" loading="lazy" decoding="async" src="/_astro/powertop-pc.CAASLFBZ_1RkS3n.webp" ><figcaption>powertop result in PC</figcaption></figure><figure class="text-center"><img alt="powertop result in Thinkpad" title="Powertop result on Thinkpad" width="1724" height="756" loading="lazy" decoding="async" src="/_astro/powertop-thinkpad.DWXxO6nx_Z23oNi6.webp" ><figcaption>powertop result in Thinkpad</figcaption></figure><figure class="text-center"><img alt="foxxy the security engineer" width="2346" height="4160" loading="lazy" decoding="async" src="/_astro/servers.DzFEBMWK_texvi.webp" ><figcaption>foxxy the security engineer</figcaption></figure>
+<h3 id="networking">Networking</h3>
+<p>There is nothing fancy going on in the networking department. I’ve subscribed to a 50Mbps internet bandwidth from a well known ISP here for a relatively fair price + additional cost for their leased ONT router. I don’t have any outage as far as I remember and it’s been running well. Two things to note though:</p>
+<ol>
+<li>It is behind a <a href="https://en.wikipedia.org/wiki/Carrier-grade_NAT" rel="nofollow" target="_blank">CGNAT</a></li>
+<li>It has some sort of LAN-to-WLAN isolation, meaning my devices connected through the LAN interface cannot communicate with devices connected to WLAN interface</li>
+</ol>
+<p>The second point forces me to buy an additional router and run it in Double-NAT configuration.
+</p><figure class="text-center"><img alt="router abomination" width="2346" height="4160" loading="lazy" decoding="async" src="/_astro/router-abomination.BPEvV5Yn_1MPsgB.webp" ><figcaption>router abomination</figcaption></figure><p></p>
+<h2 id="software">Software</h2>
+<h3 id="virtualization">Virtualization</h3>
+<p>I decided to use <a href="https://www.proxmox.com/en/" rel="nofollow" target="_blank">proxmox</a> as my Virtualization OS. It is free, easy to use, and is recommended a lot by some folks online. Here are most of what I’m currently running on my infrastructure:</p>
+<ol>
+<li>PiHole on an LXC Container as DNS server</li>
+<li><a href="https://distribution.github.io/distribution/" rel="nofollow" target="_blank">Private Image Registry</a></li>
+<li>Debian VMs for k8s nodes</li>
+<li>An LXC Container functioning as a “gate” for me to access my entire homelab via <a href="https://tailscale.com/" rel="nofollow" target="_blank">tailscale</a></li>
+</ol>
+<h3 id="remote-access">Remote Access</h3>
+<p>My home network is running behind a <a href="https://en.wikipedia.org/wiki/Carrier-grade_NAT" rel="nofollow" target="_blank">CGNAT</a> and my ISP doesn’t allow port forwarding. So, I don’t actually have an out of the box solution for accessing my home network from public internet. Luckily, <a href="https://tailscale.com/" rel="nofollow" target="_blank">tailscale</a> has an amazing service for allowing several machines to be interconnected via what they called a “tailnet”. Their free tier is more than enough for simple homelab architecture like mine for allowing up to 3 users and 100 devices to be interconnected. I installed tailscale on one dedicated LXC container called “gate” and I use that container as some sort of reverse proxy to access other services in my home network.</p>
+<h3 id="about-back-up">About Back Up</h3>
+<p>I don’t currently run any automated backup in my infrastructure. The reasons are simple:</p>
+<ol>
+<li>I don’t have a lot of storage</li>
+<li>I am cheap so I don’t really want to pay for cloud storage just to store my backup files</li>
+<li>I am not running mission critical software or anything. If all the data is gone, then so be it.</li>
+</ol>
+<p>I do, however, occasionally backup my entire VM or LXC container directly from proxmox. Proxmox supports backing up entire VM or LXC container using <a href="https://pve.proxmox.com/pve-docs/vzdump.1.html" rel="nofollow" target="_blank">vzdump</a> but honestly I only ever use the backup feature via their web UI. By default on the web UI it will compress the back up file using <a href="https://github.com/facebook/zstd" rel="nofollow" target="_blank">zstd</a> algorithm compression and store the file in <code>/var/lib/vz/dump/</code> directory.</p>
+<h3 id="kubernetes">Kubernetes</h3>
+<p>I tried to run most of my application in a <em>kubernetes cluster</em>. Except for the ones that I want easy access to backup and restore like DNS server and image registry. I chose <a href="https://docs.k3s.io/" rel="nofollow" target="_blank">K3s</a> as my Kubernetes distribution since they support HA and pretty lightweight. The Kubernetes cluster is setup in a High Availability mode consisting of 3 nodes (VM) with <code>etcd</code> as the cluster datastore. I set it up using Ansible mostly by copy-pasting code from <a href="https://github.com/k3s-io/k3s-ansible" rel="nofollow" target="_blank">k3s repo</a> with slight modifications (mostly removing stuffs I don’t use).</p>
+<figure class="text-center"><img alt="list of my kubernetes nodes" width="1214" height="300" loading="lazy" decoding="async" src="/_astro/k8s-node.4a0VtsHk_1v4ceO.webp" ><figcaption>list of my kubernetes nodes</figcaption></figure>
+<p>As for the day to day operations on the <em>kubernetes cluster</em> itself, I rely on GitOps, specifically using <a href="https://fluxcd.io/" rel="nofollow" target="_blank">fluxcd</a>. The applications running on top of the cluster itself is not that many, consisting of:</p>
+<ul>
+<li>Monitoring stack
+<ul>
+<li>Grafana</li>
+<li>Prometheus</li>
+<li>Loki</li>
+</ul>
+</li>
+<li>Github Action Runner Controller (and its runners)</li>
+<li>Apps
+<ul>
+<li>Cloudflared</li>
+<li><a href="https://novian.dev" rel="nofollow" target="_blank">The website you are currently reading</a></li>
+<li>A personal side project that I cannot share yet</li>
+</ul>
+</li>
+</ul>
+<p>I might write about those individual tech more detail in the future. And yes, yes, yes, I know, I have more workloads running infrastructure automation and monitoring than the actual applications. Hopefully I get to finish many more project in the future and will be able to update that list.</p>
+<h2 id="cost">Cost</h2>
+<p>After watching <a href="https://www.youtube.com/watch?v=MucGkPUMjNo" rel="nofollow" target="_blank">Wolfgang’c Channel’s Video</a> about building an efficient home server I became obsessed with observing how much power my entire homelab requires. And whether it is worth it to keep running them or should I just rent a cheap VPS server somewhere. I mentioned before that I’m cheap, and I want to spend as little as possible for this hobby project. So I decided to buy one of those <a href="https://www.tokopedia.com/minerhome/digital-watt-meter-power-meter-energy-meter-pengukur-arus-listrik" rel="nofollow" target="_blank">wattmeter</a>. And do some rough calculation on how much this entire setup cost me. For reference, Contabo has an <a href="https://contabo.com/en/vps/" rel="nofollow" target="_blank">offering</a> of $5.5 for 4 vCPU and 6GB of RAM so I set a limit of the same $5.5 for running the entire homelab.</p>
+<p>As seen on the image below, the total wattage for 46.5 days is around 53.54 kWh (sometimes I run my washing machine on the same outlet which adds some additional wattage but let’s ignore that). That brings the monthly electric consumption to be around 34.5 kWh. With the current price of electricity of around $0.089 ( Rp 1444.7 ) per kWh, that result in a cost of about $3.1 (IDR 49,842.15) per month which is well within my budget.</p>
+<figure class="text-center"><img alt="electricity consumption" width="2346" height="4160" loading="lazy" decoding="async" src="/_astro/electricity.DGd0YuGc_Z28MFOg.webp" ><figcaption>electricity consumption</figcaption></figure>
+<h2 id="future-work">Future Work</h2>
+<p>This setup is obviously not permanent. I might change a couple of things here and there along the way to adjust my needs. I might even ended up taking down the entire homelab should that no longer be interesting and/or give minimum to no value anymore (who knows). But as of right now there are a couple things I want try out:</p>
+<ol>
+<li><a href="https://pve.proxmox.com/wiki/High_Availability" rel="nofollow" target="_blank">HA Proxmox</a></li>
+<li>Setting up NAS</li>
+<li>Having off-site backup server</li>
+<li>Setup <a href="https://registry.terraform.io/providers/Telmate/proxmox/latest/docs" rel="nofollow" target="_blank">terraform project</a> for managing Proxmox VM / LXC.</li>
+<li>Setup new servers using more modern CPU</li>
+<li>Setup a server rack (this one has a very low wife-approval factor)</li>
+</ol>  </div> </div>  </div> <footer> <hr class="h-px my-8 bg-cream border-0"> <div class="container mx-auto text-center"> <div class="flex justify-center space-x-6"> <a href="https://www.linkedin.com/in/noviandeny/" target="_blank" class="text-white hover:text-blue-500"> <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 50 50" fill="#FFF0DC"> <path d="M41,4H9C6.24,4,4,6.24,4,9v32c0,2.76,2.24,5,5,5h32c2.76,0,5-2.24,5-5V9C46,6.24,43.76,4,41,4z M17,20v19h-6V20H17z M11,14.47c0-1.4,1.2-2.47,3-2.47s2.93,1.07,3,2.47c0,1.4-1.12,2.53-3,2.53C12.2,17,11,15.87,11,14.47z M39,39h-6c0,0,0-9.26,0-10 c0-2-1-4-3.5-4.04h-0.08C27,24.96,26,27.02,26,29c0,0.91,0,10,0,10h-6V20h6v2.56c0,0,1.93-2.56,5.81-2.56 c3.97,0,7.19,2.73,7.19,8.26V39z"></path> </svg> </a> <a href="https://github.com/anggerdeni/" target="_blank" class="text-white hover:text-gray-700"> <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 50 50" fill="#FFF0DC"> <path d="M17.791,46.836C18.502,46.53,19,45.823,19,45v-5.4c0-0.197,0.016-0.402,0.041-0.61C19.027,38.994,19.014,38.997,19,39 c0,0-3,0-3.6,0c-1.5,0-2.8-0.6-3.4-1.8c-0.7-1.3-1-3.5-2.8-4.7C8.9,32.3,9.1,32,9.7,32c0.6,0.1,1.9,0.9,2.7,2c0.9,1.1,1.8,2,3.4,2 c2.487,0,3.82-0.125,4.622-0.555C21.356,34.056,22.649,33,24,33v-0.025c-5.668-0.182-9.289-2.066-10.975-4.975 c-3.665,0.042-6.856,0.405-8.677,0.707c-0.058-0.327-0.108-0.656-0.151-0.987c1.797-0.296,4.843-0.647,8.345-0.714 c-0.112-0.276-0.209-0.559-0.291-0.849c-3.511-0.178-6.541-0.039-8.187,0.097c-0.02-0.332-0.047-0.663-0.051-0.999 c1.649-0.135,4.597-0.27,8.018-0.111c-0.079-0.5-0.13-1.011-0.13-1.543c0-1.7,0.6-3.5,1.7-5c-0.5-1.7-1.2-5.3,0.2-6.6 c2.7,0,4.6,1.3,5.5,2.1C21,13.4,22.9,13,25,13s4,0.4,5.6,1.1c0.9-0.8,2.8-2.1,5.5-2.1c1.5,1.4,0.7,5,0.2,6.6c1.1,1.5,1.7,3.2,1.6,5 c0,0.484-0.045,0.951-0.11,1.409c3.499-0.172,6.527-0.034,8.204,0.102c-0.002,0.337-0.033,0.666-0.051,0.999 c-1.671-0.138-4.775-0.28-8.359-0.089c-0.089,0.336-0.197,0.663-0.325,0.98c3.546,0.046,6.665,0.389,8.548,0.689 c-0.043,0.332-0.093,0.661-0.151,0.987c-1.912-0.306-5.171-0.664-8.879-0.682C35.112,30.873,31.557,32.75,26,32.969V33 c2.6,0,5,3.9,5,6.6V45c0,0.823,0.498,1.53,1.209,1.836C41.37,43.804,48,35.164,48,25C48,12.318,37.683,2,25,2S2,12.318,2,25 C2,35.164,8.63,43.804,17.791,46.836z"></path> </svg> </a> <a href="mailto:hello@novian.dev" class="text-white hover:text-gray-400"> <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 50 50" fill="#FFF0DC"> <path d="M2,12c0-2.211,1.789-4,4-4h40c2.211,0,4,1.789,4,4v26c0,2.211-1.789,4-4,4H6c-2.211,0-4-1.789-4-4V12z M25,28l18-12H7L25,28z"></path> </svg> </a> </div> </div> </footer> </body></html>
