@@ -1,0 +1,77 @@
+input1 = Arkav6{ uwU_e4zy_Cr 4ck_m3_uwU}
+Arkav6{uwU_e4zy_Cr4ck_m3_uwU}
+
+________________________________________
+
+>>> a = '\x01\x32\x2b\x21'
+>>> xor(a,0x40)
+'Arka'
+>>> ord(' ')
+32
+>>> b = '\x95\x97\x75\x7f\x85\x54\x9a\x99'
+>>> b = bytearray(b)
+>>> b
+bytearray(b'\x95\x97u\x7f\x85T\x9a\x99')
+>>> b_ = ''
+>>> for i in b:
+...  b_ += chr(i-32)
+... 
+>>> b_
+'uwU_e4zy'
+>>> xor('\x01\x32\x2b\x21\x36\x76\x3b',0x40)
+'Arkav6{'
+>>> b = '\x95\x97\x75\x7f\x85\x54\x9a\x99\x7f\x92'
+>>> b = bytearray(b)
+>>> b_ = ''
+>>> for i in b: 
+...  b_ += chr(i-32)
+... 
+>>> b_
+'uwU_e4zy_r'
+>>> c = '\x04\x33\x3b\x2f\x3d\x03\x2f\x45\x47\x25\x4d'
+>>> c = bytearray(c)
+>>> hex(0x2f+0x30)
+'0x5f'
+>>> c_ = ''
+>>> for i in c:
+...  c_ += chr(i+32)
+... 
+>>> c+
+  File "<stdin>", line 1
+    c+
+     ^
+SyntaxError: invalid syntax
+>>> c_
+'$S[O]#OegEm'
+>>> chr(0x34)
+'4'
+>>> c_ = ''
+>>> c = '\x04\x33\x3b\x2f\x3d\x03\x2f\x45\x47\x25\x4d'
+>>> c =bytearray(c)
+>>> c_ = ''
+>>> for i in c:
+...  c_ += chr(i+0x32)
+... 
+>>> c_
+'6emao5awyW\x7f'
+>>> c_ = ''
+>>> for i in c:
+...  c_ += chr(i+0x30)
+... 
+>>> c_
+'4ck_m3_uwU}'
+>>> b = '\x95\x97\x75\x7f\x85\x54\x9a\x99\x7f\x63\x92'
+>>> len(b)
+11
+>>> b_ = ''
+>>> b = bytearray(b)
+>>> for i in b:
+...  b_ += chr(i-32)
+... 
+>>> b_
+'uwU_e4zy_Cr'
+>>> 
+
+
+
+

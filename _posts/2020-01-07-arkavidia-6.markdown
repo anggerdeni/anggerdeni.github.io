@@ -1,0 +1,32 @@
+---
+layout: post
+title:  "Arkavidia 6 Writeup"
+date:   2020-01-07 18:59:00
+categories: jekyll update
+---
+
+## Pwn
+### uwu \[easy\]
+#### Analisa
+Diberikan sebuah binary file ELF 64 bit.
+
+![](./CTF/2020/Arkavidia%206/Reverse%20Engineering/uwu/ss/ss1.png)  
+
+
+Program ini meminta 3 buah input. 
+![](./CTF/2020/Arkavidia%206/Reverse%20Engineering/uwu/ss/ss2.png)  
+
+Langsung coba didisassemble serta decompile dengan menggunakan ghidra serta gdb (gdb-peda)
+
+to-be-continued
+
+#### Solver
+
+
+#### Flag
+
+
+
+## Reverse Engineering
+
+## Web Exploitation
