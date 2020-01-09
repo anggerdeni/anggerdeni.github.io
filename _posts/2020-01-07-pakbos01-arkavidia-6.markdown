@@ -19,7 +19,7 @@ PIE       : ENABLED
 RELRO     : FULL
 ```
 
-Tampilan program ketika dijalankan.
+Tampilan program ketika dijalankan.  
 ![](/assets/CTF/2020/Arkavidia%206/Pwn/pakbos01/ss/ss1.png)  
 
 Langsung disassemble dan decompile dengan bantuan ghidra.
@@ -131,7 +131,7 @@ r.interactive()
 r.close()
 ```
 
-Jalankan di local 
+Jalankan di local  
 ![](/assets/CTF/2020/Arkavidia%206/Pwn/pakbos01/ss/ss6.png)
 
 ```
